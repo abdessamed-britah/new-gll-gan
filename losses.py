@@ -48,7 +48,7 @@ def generator_loss(D, R, fake, clean, gan_loss,
     #    image truly being clean, and nothing stops the value going below 0.
     #    A safer variant is R(fake).clamp(min=0).mean(); left as-is to match the
     #    paper. This is one of the open questions worth probing.
-    deg = R(fake).mean()
-
+    # deg = R(fake).mean()
+    deg = R(fake).clamp(min=0).mean()
     total = lambda_gan * adv + lambda_l1 * l1 + lambda_r * deg
     return total, {"adv": adv.item(), "l1": l1.item(), "deg": deg.item()}
