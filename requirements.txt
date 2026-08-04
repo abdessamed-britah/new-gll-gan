@@ -2,3 +2,5 @@ torch>=1.7
 torchvision
 opencv-python
 numpy
+scikit-image
+matplotlib

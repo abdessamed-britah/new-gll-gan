@@ -52,9 +52,10 @@ class Generator(nn.Module):
             c *= 2
         for _ in range(n_blocks):  # residual blocks
             layers += [ResidualBlock(c, norm)]
-        for _ in range(2):  # upsampling
-            layers += [nn.ConvTranspose2d(c, c // 2, 3, stride=2, padding=1,
-                                          output_padding=1),
+        for _ in range(2):  # upsampling: resize-conv avoids checkerboard artifacts
+            layers += [nn.Upsample(scale_factor=2, mode="nearest"),
+                       nn.ReflectionPad2d(1),
+                       nn.Conv2d(c, c // 2, 3),
                        _norm(norm, c // 2), nn.ReLU(True)]
             c //= 2
         layers += [nn.ReflectionPad2d(3), nn.Conv2d(c, out_ch, 7), nn.Tanh()]
