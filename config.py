@@ -26,16 +26,20 @@ class Config:
     image_size: int = 256            # must be divisible by 4
     channels: int = 3
 
+    # The values below are the ones used to produce the results reported in
+    # the README. They fit on a 16 GB GPU; if you run out of memory, lower
+    # gan_batch_size to 4 (the rest of the settings are unaffected).
+
     # --- Regressor training (step 1) ---
-    reg_epochs: int = 10
+    reg_epochs: int = 8
     reg_lr: float = 1e-4             # paper: 1e-4, Adam
-    reg_batch_size: int = 16
+    reg_batch_size: int = 32
 
     # --- GAN training (step 2) ---
-    gan_epochs: int = 100
+    gan_epochs: int = 150
     gan_lr: float = 2e-4
     gan_betas: tuple = (0.5, 0.999)
-    gan_batch_size: int = 4
+    gan_batch_size: int = 8          # lower to 4 if the GPU runs out of memory
     lambda_gan: float = 1.0          # weight of the adversarial loss
     lambda_l1: float = 100.0         # weight of the L1 loss (pix2pix convention)
     lambda_r: float = 1.0            # weight of the degradation (regressor) loss

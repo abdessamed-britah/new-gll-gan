@@ -43,12 +43,13 @@ def generator_loss(D, R, fake, clean, gan_loss,
     l1 = l1_loss(fake, clean)
 
     # 3) degradation loss: estimated residual degradation of the generated image.
-    #    NOTE: minimising R(fake).mean() can in principle be "gamed" - the
-    #    generator may learn inputs that make R report a low value without the
-    #    image truly being clean, and nothing stops the value going below 0.
-    #    A safer variant is R(fake).clamp(min=0).mean(); left as-is to match the
-    #    paper. This is one of the open questions worth probing.
-    # deg = R(fake).mean()
+    #    As written in the paper (Eq. 6, mean(R(G(x)))) this term is unbounded
+    #    below. R is frozen, so the generator can lower it by driving R's
+    #    estimate NEGATIVE rather than by actually removing degradation - which
+    #    is what happened: the term drifted steadily negative over training
+    #    while high-frequency hatching appeared in the outputs.
+    #    Clamping each image's estimate at 0 (the "clean" level) means going
+    #    past clean earns no further reward.
     deg = R(fake).clamp(min=0).mean()
     total = lambda_gan * adv + lambda_l1 * l1 + lambda_r * deg
     return total, {"adv": adv.item(), "l1": l1.item(), "deg": deg.item()}
