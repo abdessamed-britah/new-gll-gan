@@ -18,6 +18,8 @@ A standard image-restoration GAN trains its generator with two signals: a discri
 | **D**: pixel-wise discriminator (1×1 PatchGAN) | real/fake decision per pixel |
 | **R**: ResNet-18 regressor, frozen | estimates remaining degradation → third loss term |
 
+![DLL-GAN architecture](assets/architecture.svg)
+
 Generator objective (paper Eq. 5): `L_G = L_GAN + λ·L1 + L_R`, with `L_R = mean(R(G(x)))`.
 
 ## Two issues found, and what I changed
@@ -29,6 +31,8 @@ As written in Eq. 6, `L_R = mean(R(G(x)))` has no lower bound. Because R is froz
 | GAN epoch | 1 | 20 | 40 | 60 | 80 |
 |---|---|---|---|---|---|
 | `L_R` (unbounded, 256 px run) | −0.13 | −0.60 | −0.92 | −1.50 | −1.57 |
+
+![Unbounded degradation loss](assets/unbounded_loss.svg)
 
 **Fix:** clamp each image's estimate at zero (the "clean" level), so going past it earns no reward:
 
